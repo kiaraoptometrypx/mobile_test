@@ -3,46 +3,100 @@
 <head>
 <meta charset="UTF-8" />
 <title>Duochrome (SPH Only, Light)</title>
+
+
+
+
+
+
+
+
+
+
 <style>
-  body { font-family: system-ui, sans-serif; background:#fff; text-align:center; margin:20px; }
-  #currentRx { font-weight:600; font-size:16px; margin-bottom:10px; }
+  /* ===== Vars: tweak one place ===== */
+  :root{
+    --duoW: 300px;     /* width of one duochrome panel */
+    --duoH: 300px;     /* height of one duochrome panel */
+    --gap: 5px;        /* spacing between panels (vertical stack) */
+  }
 
-  .card{ background:#fff; border-radius:10px; padding:16px 12px;
-    box-shadow:0 0 10px rgba(0,0,0,.12); display:inline-block; border:1px solid #bbb; margin:8px 0 14px; }
+  /* ===== Base ===== */
+  body{ font-family:system-ui,sans-serif; background:#fff; text-align:center; margin:20px; }
+  #currentRx{ font-weight:600; font-size:16px; margin-bottom:10px; }
 
-  .rx-input { width:120px; font-size:12px; text-align:center; padding:6px; border-radius:6px; border:1px solid #ccc; margin-bottom:6px; }
-  .btn-plus, .btn-minus { font-size:14px; border:1px solid #000; padding:6px 10px; border-radius:6px; cursor:pointer; color:#fff; transition:opacity .2s; margin:2px; }
-  .btn-plus { background:#212121; } .btn-minus{ background:#d9534f; }
-  .btn-plus:hover, .btn-minus:hover { opacity:.85; }
+  .card{
+    background:#fff; border-radius:10px; padding:16px 12px;
+    box-shadow:0 0 10px rgba(0,0,0,.12); display:inline-block; border:1px solid #bbb; margin:8px 0 14px;
+  }
 
-  /* Duochrome */
-  .duo-wrap{ display:flex; flex-direction:column; align-items:center; gap:8px; margin:12px auto; }
-.duo-row{
-  display:flex;
-  flex-direction: column;  /* stack vertically */
-  gap:5px;                 /* keep your 5px spacing */
-  justify-content:center;
-  align-items:center;
-}
+  .rx-input{
+    width:120px; font-size:12px; text-align:center; padding:6px;
+    border-radius:6px; border:1px solid #ccc; margin-bottom:6px;
+  }
 
-/* overlay mode */
-#sphCard{
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  width: 520px;   /* keep your width */
-  z-index: 1000;
-}
+  .btn-plus, .btn-minus{
+    font-size:14px; border:1px solid #000; padding:6px 10px; border-radius:6px;
+    cursor:pointer; color:#fff; transition:opacity .2s; margin:2px;
+  }
+  .btn-plus{ background:#212121; }
+  .btn-minus{ background:#d9534f; }
+  .btn-plus:hover, .btn-minus:hover{ opacity:.85; }
 
+  /* ===== Layout wrappers ===== */
+  .duo-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:8px; margin:12px auto;
+  }
+  .duo-row{
+    display:flex; flex-direction:column;      /* vertical stack */
+    gap:var(--gap); justify-content:center; align-items:center;
+  }
 
+  /* ===== Floating SPH card ===== */
+  #sphCard{
+    position:fixed; top:16px; right:16px; z-index:1000;
+  }
 
-  .duochrome{ display:flex; justify-content:center; align-items:center; width:300px; height:300px; margin:0 auto; position:relative; overflow:hidden; }
-  .duo-side{ position:relative; width:150px; height:300px; display:flex; align-items:center; justify-content:center; overflow:clip; contain:paint; isolation:isolate; }
-  @supports not (overflow: clip) { .duo-side { overflow:hidden; } }
-  .redSide  { clip-path: inset(0 0 0 10px); }
-  .blueSide { clip-path: inset(0 10px 0 0); }
-  .duo-side img.base{ width:150px; height:300px; object-fit:cover; display:block; will-change:filter; }
+  /* ===== Duochrome panels ===== */
+  .duochrome{
+    display:flex; justify-content:center; align-items:center;
+    width:var(--duoW); height:var(--duoH);
+    margin:0 auto; position:relative; overflow:hidden;
+  }
+
+  .duo-side{
+    position:relative; width:calc(var(--duoW)/2); height:var(--duoH);
+    display:flex; align-items:center; justify-content:center;
+    overflow:clip; contain:paint; isolation:isolate;
+  }
+  @supports not (overflow: clip){ .duo-side{ overflow:hidden; } }
+
+  .redSide{  clip-path: inset(0 0 0 10px); }
+  .blueSide{ clip-path: inset(0 10px 0 0); }
+
+  .duo-side img.base{
+    width:100%; height:100%; object-fit:cover; display:block; will-change:filter;
+  }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </head>
 <body>
 
@@ -102,7 +156,7 @@
 
 <script>
 /* ===== Minimal State (SPH only) ===== */
-const K_BLUR_PER_D = 2.0;     // blur strength per diopter
+const K_BLUR_PER_D = 1.0;     // blur strength per diopter
 const FC_BLUR_GAIN = 0.50;    // not used now (no fan chart)
 const TARGET_S = 0.00;        // <<< start target at 0.00
 
