@@ -79,6 +79,26 @@
   transition: filter 160ms ease;   /* ← smooths the blur change */
 
   }
+
+/* Zoom sizes */
+:root{
+  --duoW0: 200px;              /* base size for one panel */
+  --duoH0: 200px;
+  --duoW: var(--duoW0);
+  --duoH: var(--duoH0);
+}
+body.zoom2{                     /* doubled when zoomed */
+  --duoW: calc(var(--duoW0) * 2);
+  --duoH: calc(var(--duoH0) * 2);
+}
+
+/* Zoom button */
+.zoom-btn{
+  font-size:12px; padding:6px 12px; border:1px solid #000; border-radius:10px;
+  background:#dcdcdc; cursor:pointer; margin:8px 0;
+}
+.zoom-btn:hover{ background:#c8c8c8; }
+
 </style>
 
 
@@ -113,6 +133,8 @@
       <div>
         <button onclick="adjSph(-0.25)" class="btn-minus">−0.25</button>
         <button onclick="adjSph( 0.25)" class="btn-plus">+0.25</button><br>
+<button id="zoomBtn" class="zoom-btn">Zoom 2×</button>
+
       </div>
     </div>
   </div>
@@ -210,6 +232,18 @@ function adjSph(step){
   sphInput.dispatchEvent(new Event('input'));
 }
 sphInput.addEventListener('input', updateDuochrome);
+
+
+
+const zoomBtn = document.getElementById('zoomBtn');
+zoomBtn.addEventListener('click', () => {
+  document.body.classList.toggle('zoom2');
+  zoomBtn.textContent = document.body.classList.contains('zoom2') ? 'Zoom 1×' : 'Zoom 2×';
+});
+
+
+
+
 
 /* Init */
 (function init(){
