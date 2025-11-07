@@ -76,6 +76,8 @@
 
   .duo-side img.base{
     width:100%; height:100%; object-fit:cover; display:block; will-change:filter;
+  transition: filter 160ms ease;   /* ← smooths the blur change */
+
   }
 </style>
 
@@ -177,33 +179,28 @@ const SIZES = [1,2,3], cache = {};
   });
 })();
 
-/* Helpers */
-const quant05 = v => Math.round(v*2)/2;
+
 
 /* Update duochrome view: only SPH delta matters */
 function updateDuochrome(){
   const participantS = parseFloat(sphInput.value) || 0;
-  const deltaSE = TARGET_S - participantS;         // 0 - 0 at start → neutral
-  const s = Math.abs(deltaSE);
-  const primary = s * K_BLUR_PER_D;
-  const secondary = (s >= 0.75) ? ((s - 0.5) * K_BLUR_PER_D) : 0;
+  const deltaSE = TARGET_S - participantS;
+  const blur = Math.abs(deltaSE) * K_BLUR_PER_D;
 
-  let blurRed=0, blurBlue=0;
-  if (deltaSE > 0){        // participant too plus → red blurrier
-    blurRed  = primary;
-    blurBlue = secondary;
-  } else if (deltaSE < 0){ // participant too minus → blue blurrier
-    blurBlue = primary;
-    blurRed  = secondary;
-  } else {
-    blurRed = blurBlue = 0;
+  let blurRed = 0, blurBlue = 0;
+  if (deltaSE > 0){        // more minus → affect RED only
+    blurRed = blur;
+  } else if (deltaSE < 0){ // more plus  → affect BLUE only
+    blurBlue = blur;
   }
 
-  const r = `blur(${quant05(blurRed)}px)`;
-  const b = `blur(${quant05(blurBlue)}px)`;
+  const r = `blur(${blurRed.toFixed(3)}px)`;   // ← no 0.5px snapping
+  const b = `blur(${blurBlue.toFixed(3)}px)`;
   redImgs.forEach(img => img.style.filter = r);
   blueImgs.forEach(img => img.style.filter = b);
 }
+
+
 
 /* SPH input + buttons */
 function adjSph(step){
