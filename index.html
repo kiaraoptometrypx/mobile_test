@@ -22,7 +22,16 @@
   }
 
   /* ===== Base ===== */
-  body{ font-family:system-ui,sans-serif; background:#fff; text-align:center; margin:20px; }
+body{ 
+  font-family:system-ui,sans-serif; 
+  background:#ededed; 
+  text-align:center; 
+  margin:20px; 
+}
+
+
+
+
   #currentRx{ font-weight:600; font-size:16px; margin-bottom:10px; }
 
   .card{
@@ -47,15 +56,21 @@
   .duo-wrap{
     display:flex; flex-direction:column; align-items:center; gap:8px; margin:12px auto;
   }
-  .duo-row{
-    display:flex; flex-direction:column;      /* vertical stack */
-    gap:var(--gap); justify-content:center; align-items:center;
-  }
+.duo-row{
+  display: flex;
+  flex-direction: row;      /* horizontal row */
+  gap: var(--gap);
+  justify-content: center;
+  align-items: center;
+}
 
-  /* ===== Floating SPH card ===== */
-  #sphCard{
-    position:fixed; top:16px; right:16px; z-index:1000;
-  }
+
+/* ===== SPH card at bottom ===== */
+#sphCard{
+  position: static;
+  margin: 20px auto;
+}
+
 
   /* ===== Duochrome panels ===== */
   .duochrome{
@@ -121,24 +136,57 @@ body.zoom2{                     /* doubled when zoomed */
 
 </head>
 <body>
+<div style="height:50px"></div>
 
-<div id="currentRx">Kiara Optometry Sph Finder</div>
+
+<div class="slider-container">
+  <label for="scaleRange">Scale:</label>
+  <input type="range" id="scaleRange" min="0.1" max="0.5" step="0.01" value="0.5">
+</div>
+
+<div class="image-container" style="display:flex; justify-content:center; align-items:center; height:120vh;">
+  <div class="image-wrapper" style="transform: scale(0.5); transform-origin: center;">
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/mobile_test/main/Near.png" alt="Near Test">
+  </div>
+</div>
+
+
+<script>
+const slider = document.getElementById('scaleRange');
+const scaleValue = document.getElementById('scaleValue');
+const imgWrapper = document.querySelector('.image-wrapper');
+
+slider.addEventListener('input', () => {
+  const scale = parseFloat(slider.value);
+  imgWrapper.style.transform = `scale(${scale})`;
+  scaleValue.textContent = scale.toFixed(2) + 'x';
+});
+</script>
+
+
+
+
+<div id="currentRx"></div>
 
 <!-- SPH Controls -->
 <div id="sphCard" class="card" style="width:220px">
   <div style="display:flex; gap:40px; justify-content:center; align-items:flex-start; flex-wrap:wrap;">
     <div style="text-align:center;">
-      <label><b>SPH</b></label><br>
+      <label><b>Near Add Estimator</b></label><br>
       <input type="number" id="sph" step="0.25" value="0.00" class="rx-input"><br>
       <div>
         <button onclick="adjSph(-0.25)" class="btn-minus">−0.25</button>
         <button onclick="adjSph( 0.25)" class="btn-plus">+0.25</button><br>
-<button id="zoomBtn" class="zoom-btn">Zoom 2×</button>
+<button style="display:none" id="zoomBtn" class="zoom-btn">Zoom 2×</button>
 
       </div>
     </div>
   </div>
 </div>
+
+
+
+
 
 <!-- Duochrome: show 3 sizes side-by-side -->
 <div class="duo-wrap">
@@ -176,11 +224,16 @@ body.zoom2{                     /* doubled when zoomed */
 <div style="height:300px"></div>
 
   </div>
+
+
+
+
+
 </div>
 
 <script>
 /* ===== Minimal State (SPH only) ===== */
-const K_BLUR_PER_D = 0.50;     // blur strength per diopter
+const K_BLUR_PER_D = 1.50;     // blur strength per diopter
 const FC_BLUR_GAIN = 0.50;    // not used now (no fan chart)
 const TARGET_S = 0.00;        // <<< start target at 0.00
 
