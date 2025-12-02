@@ -1,28 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Single Image</title>
+<meta charset="UTF-8" />
+<title>Duochrome (SPH Only, Light)</title>
+
+
+
+
+
+
+
+
+
+
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #fff;
+  /* ===== Vars: tweak one place ===== */
+  :root{
+    --duoW: 200px;     /* width of one duochrome panel */
+    --duoH: 200px;     /* height of one duochrome panel */
+    --gap: 5px;        /* spacing between panels (vertical stack) */
   }
-  img {
-    max-width: 100%;
-    height: auto;
-    display: block;
+
+  /* ===== Base ===== */
+  body{ font-family:system-ui,sans-serif; background:#fff; text-align:center; margin:20px; }
+  #currentRx{ font-weight:600; font-size:16px; margin-bottom:10px; }
+
+  .card{
+    background:#fff; border-radius:10px; padding:16px 12px;
+    box-shadow:0 0 10px rgba(0,0,0,.12); display:inline-block; border:1px solid #bbb; margin:8px 0 14px;
   }
+
+  .rx-input{
+    width:120px; font-size:12px; text-align:center; padding:6px;
+    border-radius:6px; border:1px solid #ccc; margin-bottom:6px;
+  }
+
+  .btn-plus, .btn-minus{
+    font-size:14px; border:1px solid #000; padding:6px 10px; border-radius:6px;
+    cursor:pointer; color:#fff; transition:opacity .2s; margin:2px;
+  }
+  .btn-plus{ background:#212121; }
+  .btn-minus{ background:#d9534f; }
+  .btn-plus:hover, .btn-minus:hover{ opacity:.85; }
+
+  /* ===== Layout wrappers ===== */
+  .duo-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:8px; margin:12px auto;
+  }
+  .duo-row{
+    display:flex; flex-direction:column;      /* vertical stack */
+    gap:var(--gap); justify-content:center; align-items:center;
+  }
+
+  /* ===== Floating SPH card ===== */
+  #sphCard{
+    position:fixed; top:16px; right:16px; z-index:1000;
+  }
+
+  /* ===== Duochrome panels ===== */
+  .duochrome{
+    display:flex; justify-content:center; align-items:center;
+    width:var(--duoW); height:var(--duoH);
+    margin:0 auto; position:relative; overflow:hidden;
+  }
+
+  .duo-side{
+    position:relative; width:calc(var(--duoW)/2); height:var(--duoH);
+    display:flex; align-items:center; justify-content:center;
+    overflow:clip; contain:paint; isolation:isolate;
+  }
+  @supports not (overflow: clip){ .duo-side{ overflow:hidden; } }
+
+  .redSide{  clip-path: inset(0 0 0 10px); }
+  .blueSide{ clip-path: inset(0 10px 0 0); }
+
+  .duo-side img.base{
+    width:100%; height:100%; object-fit:cover; display:block; will-change:filter;
+  transition: filter 160ms ease;   /* ← smooths the blur change */
+
+  }
+
+/* Zoom sizes */
+:root{
+  --duoW0: 200px;              /* base size for one panel */
+  --duoH0: 200px;
+  --duoW: var(--duoW0);
+  --duoH: var(--duoH0);
+}
+body.zoom2{                     /* doubled when zoomed */
+  --duoW: calc(var(--duoW0) * 2);
+  --duoH: calc(var(--duoH0) * 2);
+}
+
+/* Zoom button */
+.zoom-btn{
+  font-size:12px; padding:6px 12px; border:1px solid #000; border-radius:10px;
+  background:#dcdcdc; cursor:pointer; margin:8px 0;
+}
+.zoom-btn:hover{ background:#c8c8c8; }
+
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </head>
 <body>
 
-<img src="https://raw.githubusercontent.com/kiaraoptometrypx/mobile_test/main/Near.png" alt="Near Test">
+<div id="currentRx">Kiara Optometry Sph Finder</div>
+
+<!-- SPH Controls -->
+<div id="sphCard" class="card" style="width:220px">
+  <div style="display:flex; gap:40px; justify-content:center; align-items:flex-start; flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <label><b>SPH</b></label><br>
+      <input type="number" id="sph" step="0.25" value="0.00" class="rx-input"><br>
+      <div>
+        <button onclick="adjSph(-0.25)" class="btn-minus">−0.25</button>
+        <button onclick="adjSph( 0.25)" class="btn-plus">+0.25</button><br>
+<button id="zoomBtn" class="zoom-btn">Zoom 2×</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Duochrome: show 3 sizes side-by-side -->
+<div class="duo-wrap">
+  <div class="duo-row">
+
+    <!-- Size 3 -->
+    <div class="duochrome">
+      <div class="duo-side redSide">
+        <img class="base" id="redImg3"  src="https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/RED_3.png"  alt="">
+      </div>
+      <div class="duo-side blueSide">
+        <img class="base" id="blueImg3" src="https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/BLUE_3.png" alt="">
+      </div>
+    </div>
+
+    <!-- Size 2 -->
+    <div class="duochrome">
+      <div class="duo-side redSide">
+        <img class="base" id="redImg2"  src="https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/RED_2.png"  alt="">
+      </div>
+      <div class="duo-side blueSide">
+        <img class="base" id="blueImg2" src="https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/BLUE_2.png" alt="">
+      </div>
+    </div>
+
+    <!-- Size 1 -->
+    <div class="duochrome">
+      <div class="duo-side redSide">
+        <img class="base" id="redImg1"  src="https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/RED_1.png"  alt="">
+      </div>
+      <div class="duo-side blueSide">
+        <img class="base" id="blueImg1" src="https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/BLUE_1.png" alt="">
+      </div>
+    </div>
+<div style="height:300px"></div>
+
+  </div>
+</div>
+
+<script>
+/* ===== Minimal State (SPH only) ===== */
+const K_BLUR_PER_D = 0.50;     // blur strength per diopter
+const FC_BLUR_GAIN = 0.50;    // not used now (no fan chart)
+const TARGET_S = 0.00;        // <<< start target at 0.00
+
+/* Elements */
+const sphInput = document.getElementById('sph');
+const redImgs  = [ 'redImg1','redImg2','redImg3' ].map(id=>document.getElementById(id));
+const blueImgs = [ 'blueImg1','blueImg2','blueImg3' ].map(id=>document.getElementById(id));
+
+/* Preload (kept) */
+const SIZES = [1,2,3], cache = {};
+(function preloadAll(){
+  SIZES.forEach(sz=>{
+    ["RED","BLUE"].forEach(col=>{
+      const url = `https://raw.githubusercontent.com/kiaraoptometrypx/Trainer/main/${col}_${sz}.png`;
+      const im = new Image(); im.decoding = "async"; im.src = url;
+      cache[`${col}_${sz}`] = im;
+    });
+  });
+})();
+
+
+
+/* Update duochrome view: only SPH delta matters */
+function updateDuochrome(){
+  const participantS = parseFloat(sphInput.value) || 0;
+  const deltaSE = TARGET_S - participantS;
+  const blur = Math.abs(deltaSE) * K_BLUR_PER_D;
+
+  let blurRed = 0, blurBlue = 0;
+  if (deltaSE > 0){        // more minus → affect RED only
+    blurRed = blur;
+  } else if (deltaSE < 0){ // more plus  → affect BLUE only
+    blurBlue = blur;
+  }
+
+  const r = `blur(${blurRed.toFixed(3)}px)`;   // ← no 0.5px snapping
+  const b = `blur(${blurBlue.toFixed(3)}px)`;
+  redImgs.forEach(img => img.style.filter = r);
+  blueImgs.forEach(img => img.style.filter = b);
+}
+
+
+
+/* SPH input + buttons */
+function adjSph(step){
+  let v = parseFloat(sphInput.value)||0;
+  v += step;
+  sphInput.value = v.toFixed(2);
+  sphInput.dispatchEvent(new Event('input'));
+}
+sphInput.addEventListener('input', updateDuochrome);
+
+
+
+const zoomBtn = document.getElementById('zoomBtn');
+zoomBtn.addEventListener('click', () => {
+  document.body.classList.toggle('zoom2');
+  zoomBtn.textContent = document.body.classList.contains('zoom2') ? 'Zoom 1×' : 'Zoom 2×';
+});
+
+
+
+
+
+/* Init */
+(function init(){
+  // >>> start at 0.00 with neutral duochrome
+  sphInput.value = "0.00";
+  updateDuochrome();
+})();
+</script>
 
 </body>
 </html>
